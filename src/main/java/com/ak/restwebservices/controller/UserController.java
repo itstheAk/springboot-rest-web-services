@@ -3,6 +3,7 @@ package com.ak.restwebservices.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +27,15 @@ public class UserController {
 	}
 	
 	@GetMapping(path = "/users/{id}")
-	public User findUser(@PathVariable(name = "id") int id) {
-		return userDaoService.findOne(id);
+	public ResponseEntity<User> findUser(@PathVariable(name = "id") int id) {
+		ResponseEntity<User> response;
+		User user =  userDaoService.findOne(id);
+		if(user != null) {
+			response = new ResponseEntity<User>(user, HttpStatus.OK);
+		} else {
+			response = ResponseEntity.notFound().build();
+		}
+		return response;
 	}
 	
 	@PostMapping(path = "/users")
