@@ -22,6 +22,7 @@ public class UserDao {
 	}
 	
 	public User save(User newUser) {
+		count = users.size();
 		newUser.setId(++count);
 		users.add(newUser);
 		return newUser;
