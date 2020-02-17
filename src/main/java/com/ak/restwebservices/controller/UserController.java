@@ -14,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ak.restwebservices.bean.User;
 import com.ak.restwebservices.dao.UserDao;
+import com.ak.restwebservices.exception.AppRTException;
 
 @RestController
 public class UserController {
@@ -28,12 +29,16 @@ public class UserController {
 	
 	@GetMapping(path = "/users/{id}")
 	public ResponseEntity<User> findUser(@PathVariable(name = "id") int id) {
-		ResponseEntity<User> response;
-		User user =  userDaoService.findOne(id);
-		if(user != null) {
-			response = new ResponseEntity<User>(user, HttpStatus.OK);
-		} else {
-			response = ResponseEntity.notFound().build();
+		ResponseEntity<User> response = null;
+		try {
+			User user =  userDaoService.findOne(id);
+			if(user != null) {
+				response = new ResponseEntity<User>(user, HttpStatus.OK);
+			} else {
+				response = ResponseEntity.notFound().build();
+			}
+		} catch (Exception e) {
+			throw new AppRTException(e.getMessage());
 		}
 		return response;
 	}
