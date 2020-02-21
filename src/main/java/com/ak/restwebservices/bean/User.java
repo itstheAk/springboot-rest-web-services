@@ -1,8 +1,11 @@
 package com.ak.restwebservices.bean;
 
+import javax.validation.constraints.Size;
+
 public class User {
 	
 	private int id;
+	@Size(min = 2, max = 30, message = "Invalid Name")
 	private String name;
 	private String email;
 	private String phone;

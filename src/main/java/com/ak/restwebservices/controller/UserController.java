@@ -2,6 +2,8 @@ package com.ak.restwebservices.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +41,7 @@ public class UserController {
 	}
 	
 	@PostMapping(path = "/users")
-	public ResponseEntity<Object> createUser(@RequestBody User user) {
+	public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
 		userDaoService.save(user);
 		return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri()).build();
 	}
