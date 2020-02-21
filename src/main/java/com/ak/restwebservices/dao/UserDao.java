@@ -1,6 +1,7 @@
 package com.ak.restwebservices.dao;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,20 @@ public class UserDao {
 			}
 		}
 		return null;
+	}
+	
+	public User remove(int id) {
+		Iterator<User>  usetIterator = users.iterator();
+		User userToBeRemoved = null;
+		while(usetIterator.hasNext()) {
+			User user = usetIterator.next();
+			if(user != null && user.getId() == id) {
+				userToBeRemoved = user;
+				usetIterator.remove();
+				break;
+			}
+		}
+		return userToBeRemoved;
 	}
 
 }
