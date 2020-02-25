@@ -5,8 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,14 +32,14 @@ public class UserController {
 	}
 	
 	@GetMapping(path = "/users/{id}")
-	public EntityModel<User> findUser(@PathVariable(name = "id") int id) {
+	public Resource<User> findUser(@PathVariable(name = "id") int id) {
 		User user =  userDaoService.findOne(id);
 		if(user == null) {
 			throw new NotFoundException(id + " Not found");
 		} 
 		
-		EntityModel<User> userResource = new EntityModel<>(user);
-		WebMvcLinkBuilder linkTo= WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).findAllUsers());
+		Resource<User> userResource = new Resource<>(user);
+		ControllerLinkBuilder linkTo= ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass()).findAllUsers());
 		userResource.add(linkTo.withRel("all-users"));
 		return userResource;
 		
