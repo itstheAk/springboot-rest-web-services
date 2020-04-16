@@ -2,6 +2,10 @@ package com.ak.restwebservices.bean;
 
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
+//@JsonIgnoreProperties(value = {"email"})
+@JsonFilter("UserBeanFilter")
 public class User {
 	
 	private int id;
