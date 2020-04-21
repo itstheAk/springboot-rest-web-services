@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ak.restwebservices.bean.User;
-import com.ak.restwebservices.dao.UserDao;
+import com.ak.restwebservices.bean.UserV1;
+import com.ak.restwebservices.bean.UserV2;
+import com.ak.restwebservices.dao.UserV1Dao;
+import com.ak.restwebservices.dao.UserV2Dao;
 import com.ak.restwebservices.exception.NotFoundException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -28,15 +30,18 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 public class UserController {
 
 	@Autowired
-	private UserDao userDaoService;
+	private UserV1Dao userV1DaoService;
 	
-	@GetMapping(path = "/users")
-	public MappingJacksonValue findAllUsers() {
-		List<User> actualUsers = userDaoService.findAll();
+	@Autowired
+	private UserV2Dao userV2DaoService;
+	
+	@GetMapping(path = "/v1/users")
+	public MappingJacksonValue findAllUsersV1() {
+		List<UserV1> actualUsers = userV1DaoService.findAll();
 		
 		
 		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("email","phone");
-		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilter", userFilter);
+		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV1", userFilter);
 		
 		MappingJacksonValue filteredData = new MappingJacksonValue(actualUsers);
 		filteredData.setFilters(filter);
@@ -44,19 +49,19 @@ public class UserController {
 		return filteredData;
 	}
 	
-	@GetMapping(path = "/users/{id}")
-	public MappingJacksonValue findUser(@PathVariable(name = "id") int id) {
-		User user =  userDaoService.findOne(id);
+	@GetMapping(path = "/v1/users/{id}")
+	public MappingJacksonValue findUserV1(@PathVariable(name = "id") int id) {
+		UserV1 user =  userV1DaoService.findOne(id);
 		if(user == null) {
 			throw new NotFoundException(id + " Not found");
 		}
 		
-		Resource<User> userResource = new Resource<>(user);
-		ControllerLinkBuilder linkTo= ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass()).findAllUsers());
+		Resource<UserV1> userResource = new Resource<>(user);
+		ControllerLinkBuilder linkTo= ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass()).findAllUsersV1());
 		userResource.add(linkTo.withRel("all-users"));
 		
 		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("email","phone");
-		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilter", userFilter);
+		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV1", userFilter);
 		
 		MappingJacksonValue filteredData = new MappingJacksonValue(userResource);
 		filteredData.setFilters(filter);
@@ -65,15 +70,65 @@ public class UserController {
 		
 	}
 	
-	@PostMapping(path = "/users")
-	public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
-		userDaoService.save(user);
+	@PostMapping(path = "/v1/users")
+	public ResponseEntity<Object> createUserV1(@Valid @RequestBody UserV1 user) {
+		userV1DaoService.save(user);
 		return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri()).build();
 	}
 	
-	@DeleteMapping(path = "/users/{id}")
-	public void removeUser(@PathVariable(name = "id") int id) {
-		User removedUser = userDaoService.remove(id);
+	@DeleteMapping(path = "/v1/users/{id}")
+	public void removeUserV1(@PathVariable(name = "id") int id) {
+		UserV1 removedUser = userV1DaoService.remove(id);
+		
+		if(removedUser == null) {
+			throw new NotFoundException(id + " Not found");
+		}
+	}
+	
+	@GetMapping(path = "/v2/users")
+	public MappingJacksonValue findAllUsersV2() {
+		List<UserV2> actualUsers = userV2DaoService.findAll();
+		
+		
+		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id","name","contacts");
+		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV2", userFilter);
+		
+		MappingJacksonValue filteredData = new MappingJacksonValue(actualUsers);
+		filteredData.setFilters(filter);
+		
+		return filteredData;
+	}
+	
+	@GetMapping(path = "/v2/users/{id}")
+	public MappingJacksonValue findUserV2(@PathVariable(name = "id") int id) {
+		UserV2 user =  userV2DaoService.findOne(id);
+		if(user == null) {
+			throw new NotFoundException(id + " Not found");
+		}
+		
+		Resource<UserV2> userResource = new Resource<>(user);
+		ControllerLinkBuilder linkTo= ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass()).findAllUsersV2());
+		userResource.add(linkTo.withRel("all-users"));
+		
+		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id","name","contacts");
+		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV2", userFilter);
+		
+		MappingJacksonValue filteredData = new MappingJacksonValue(userResource);
+		filteredData.setFilters(filter);
+		
+		return filteredData;
+		
+	}
+	
+	@PostMapping(path = "/v2/users")
+	public ResponseEntity<Object> createUserV2(@Valid @RequestBody UserV2 user) {
+		userV2DaoService.save(user);
+		return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri()).build();
+	}
+	
+	@DeleteMapping(path = "/v2/users/{id}")
+	public void removeUserV2(@PathVariable(name = "id") int id) {
+		UserV2 removedUser = userV2DaoService.remove(id);
 		
 		if(removedUser == null) {
 			throw new NotFoundException(id + " Not found");
