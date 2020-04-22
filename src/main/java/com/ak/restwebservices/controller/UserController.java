@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -133,5 +134,31 @@ public class UserController {
 		if(removedUser == null) {
 			throw new NotFoundException(id + " Not found");
 		}
+	}
+	
+	@GetMapping(path = "/v3/users")
+	public MappingJacksonValue findAllUsersV3(@RequestParam(name = "version", required = false, defaultValue = "1.0") String version) {
+		
+		MappingJacksonValue filteredData = null;
+		
+		if("2.0".equals(version)) {
+			List<UserV2> actualUsers = userV2DaoService.findAll();
+			
+			SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "contacts");
+			FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV2", userFilter);
+			
+			filteredData = new MappingJacksonValue(actualUsers);
+			filteredData.setFilters(filter);
+			
+		} else {
+			List<UserV1> actualUsers = userV1DaoService.findAll();
+			
+			SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("email","phone");
+			FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV1", userFilter);
+			
+			filteredData = new MappingJacksonValue(actualUsers);
+			filteredData.setFilters(filter);
+		}
+		return filteredData;
 	}
 }
