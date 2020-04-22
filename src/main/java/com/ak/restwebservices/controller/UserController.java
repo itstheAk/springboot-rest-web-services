@@ -90,7 +90,7 @@ public class UserController {
 		List<UserV2> actualUsers = userV2DaoService.findAll();
 		
 		
-		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id","name","contacts");
+		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "contacts");
 		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV2", userFilter);
 		
 		MappingJacksonValue filteredData = new MappingJacksonValue(actualUsers);
@@ -110,7 +110,7 @@ public class UserController {
 		ControllerLinkBuilder linkTo= ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass()).findAllUsersV2());
 		userResource.add(linkTo.withRel("all-users"));
 		
-		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id","name","contacts");
+		SimpleBeanPropertyFilter userFilter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "contacts");
 		FilterProvider filter = new SimpleFilterProvider().addFilter("UserBeanFilterV2", userFilter);
 		
 		MappingJacksonValue filteredData = new MappingJacksonValue(userResource);
